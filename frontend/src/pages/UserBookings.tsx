@@ -17,7 +17,7 @@ import { Tabs, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { CalendarIcon, Users, Hotel, CreditCard, XCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 
-// Define types for the booking data
+// Define the booking type to fix TypeScript errors
 interface BookingRoom {
   roomNumber: string;
   roomType: {
@@ -28,16 +28,16 @@ interface BookingRoom {
 interface Booking {
   id: string;
   bookingReference: string;
+  status: string;
+  createdAt: string;
   checkInDate: string;
   checkOutDate: string;
   adults: number;
   children: number;
+  room: BookingRoom;
   occupancyType: string;
   extraBed: boolean;
   totalAmount: number;
-  status: string;
-  createdAt: string;
-  room: BookingRoom;
 }
 
 const UserBookings = () => {
