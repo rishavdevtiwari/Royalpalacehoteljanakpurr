@@ -12,7 +12,7 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { toast } from "sonner";
-import { useSendContactForm } from "../api/useContact";
+import { useSubmitContactForm } from "../api/useContact";
 
 const Contact: React.FC = () => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -25,7 +25,7 @@ const Contact: React.FC = () => {
   });
 
   // Get the mutation hook for submitting the contact form
-  const { mutate: submitContactForm, isPending } = useSendContactForm();
+  const { mutate: submitContactForm, isPending } = useSubmitContactForm();
 
   // Animation on page load
   useEffect(() => {

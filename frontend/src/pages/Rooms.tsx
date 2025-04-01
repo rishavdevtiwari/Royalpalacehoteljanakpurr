@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { ROOM_TYPES } from "apps/frontend/src/data/roomData";
+import { ROOM_TYPES } from "../data/roomData";
 import RoomCard from "../components/RoomCard";
 import { Bed, Users, DollarSign, Filter } from "lucide-react";
 import { Button } from "../components/ui/button";

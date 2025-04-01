@@ -27,7 +27,7 @@ import {
 } from "../components/ui/dropdown-menu";
 import { Button } from "../components/ui/button";
 import { Badge } from "../components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "../components/ui/tabs";
 import {
   Home,
   Users,
@@ -439,8 +439,8 @@ const Dashboard: React.FC = () => {
                             label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                             labelLine={false}
                           >
-                            {bookingData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            {bookingData.map((index) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[Number(index) % COLORS.length]} />
                             ))}
                           </Pie>
                           <Tooltip 

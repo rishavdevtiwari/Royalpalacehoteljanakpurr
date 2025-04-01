@@ -6,7 +6,7 @@ import { Check } from "lucide-react";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import { differenceInDays } from "date-fns";
-import { EXTRA_BED_CHARGE } from "apps/frontend/src/data/roomData";
+import { EXTRA_BED_CHARGE } from "../../data/roomData";
 
 interface GuestDetails {
   fullName: string;

@@ -12,7 +12,7 @@ const __dirname = path.resolve();
 
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname, "/frontend/dist")));
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
 app.get("/hello", (req, res) => {
   res.send("Hello World! API is working fine.");

@@ -9,7 +9,7 @@ import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Alert, AlertDescription } from "../ui/alert";
 import { Separator } from "../ui/separator";
-import { EXTRA_BED_CHARGE } from "apps/frontend/src/data/roomData";
+import { EXTRA_BED_CHARGE } from "../../data/roomData";
 import { differenceInDays } from "date-fns";
 
 interface GuestDetails {

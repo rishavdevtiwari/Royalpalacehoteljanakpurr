@@ -1,8 +1,5 @@
-
 import { useMutation, useQuery } from '@tanstack/react-query';
-
-// API URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+import { API_URL } from '../config/api';
 
 // Booking types
 export interface BookingFormData {
@@ -57,6 +54,7 @@ export const useCreateBooking = () => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(bookingData),
+        credentials: 'include'
       });
       
       if (!response.ok) {
@@ -84,6 +82,7 @@ export const useGetUserBookings = () => {
         headers: {
           'Authorization': `Bearer ${token}`
         },
+        credentials: 'include'
       });
       
       if (!response.ok) {
@@ -112,6 +111,7 @@ export const useGetBookingById = (bookingId: string) => {
         headers: {
           'Authorization': `Bearer ${token}`
         },
+        credentials: 'include'
       });
       
       if (!response.ok) {
@@ -142,6 +142,7 @@ export const useUpdateBookingStatus = () => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ status }),
+        credentials: 'include'
       });
       
       if (!response.ok) {

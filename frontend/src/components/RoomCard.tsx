@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { ChevronRight } from "lucide-react";
-import { RoomType } from "apps/frontend/src/data/roomData";
+import { RoomType } from "../../src/data/roomData";
 
 interface RoomCardProps {
   room: RoomType;

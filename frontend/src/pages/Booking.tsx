@@ -1,19 +1,19 @@
 
 import React, { useState, useEffect } from "react";
 import { differenceInDays } from "date-fns";
-import { EXTRA_BED_CHARGE } from "apps/frontend/src/data/roomData";
+import { EXTRA_BED_CHARGE } from "../data/roomData";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { toast } from "sonner";
-import { getRoomById } from "apps/frontend/src/data/roomData";
+import { getRoomById } from "../data/roomData";
 import { useCreateBooking } from "../api/useBookings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 
 // Import our new components
-import BookingStepSelect from "apps/frontend/src/components/booking/BookingStepSelect";
-import BookingStepDetails from "apps/frontend/src/components/booking/BookingStepDetails";
-import BookingStepPayment from "apps/frontend/src/components/booking/BookingStepPayment";
-import BookingStepConfirmation from "apps/frontend/src/components/booking/BookingStepConfirmation";
+import BookingStepSelect from "../components/booking/BookingStepSelect";
+import BookingStepDetails from "../components/booking/BookingStepDetails";
+import BookingStepPayment from "../components/booking/BookingStepPayment";
+import BookingStepConfirmation from "../components/booking/BookingStepConfirmation";
 
 type BookingStep = "select" | "details" | "payment" | "confirmation";
 

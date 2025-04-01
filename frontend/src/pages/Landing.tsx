@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Calendar, ChevronRight, Wifi, Utensils, Car, Coffee, Wind, Tv, ShowerHead, MapPin, Landmark, Waves, PartyPopper, Sofa, Facebook, Mail, Phone, MessageSquare, Image } from "lucide-react";
+import { Calendar, ChevronRight, Wifi, Utensils, Car, Coffee, Tv, ShowerHead, Landmark, Waves, PartyPopper, Sofa, Facebook, Mail, Phone, MessageSquare, Image } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
-import { ROOM_TYPES } from "apps/frontend/src/data/roomData";
+import { ROOM_TYPES } from "../data/roomData";
 import RoomCard from "../components/RoomCard";
 
 // Amenities
@@ -29,7 +29,10 @@ const AMENITIES = [{
 }, {
   icon: Sofa,
   name: "Lounge Area"
-}, {
+},{
+  icon: Tv,
+  name: "Flat Screen TV"
+},{
   icon: ShowerHead,
   name: "Luxury Bathrooms"
 }];
@@ -181,7 +184,7 @@ const Landing: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {ROOM_TYPES.slice(0, 3).map((room, index) => <RoomCard key={room.id} room={room} />)}
+            {ROOM_TYPES.slice(0, 3).map((room) => <RoomCard key={room.id} room={room} />)}
           </div>
 
           <div className="text-center mt-12">

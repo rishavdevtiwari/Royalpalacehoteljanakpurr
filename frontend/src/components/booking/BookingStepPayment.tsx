@@ -8,7 +8,7 @@ import { Label } from "../ui/label";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Checkbox } from "../ui/checkbox";
 import { Separator } from "../ui/separator";
-import { EXTRA_BED_CHARGE } from "apps/frontend/src/data/roomData";
+import { EXTRA_BED_CHARGE } from "../../data/roomData";
 
 interface BookingStepPaymentProps {
   selectedRoom: any;

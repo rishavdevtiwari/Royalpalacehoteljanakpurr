@@ -18,7 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Calendar } from "../ui/calendar";
 import { Checkbox } from "../ui/checkbox";
 import { cn } from "../../lib/utils";
-import { ROOM_TYPES, EXTRA_BED_CHARGE } from "apps/frontend/src/data/roomData";
+import { ROOM_TYPES, EXTRA_BED_CHARGE } from "../../data/roomData";
 
 interface DateRange {
   checkIn: Date | undefined;

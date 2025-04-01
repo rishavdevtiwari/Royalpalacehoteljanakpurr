@@ -1,76 +1,87 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { toast } from "sonner";
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import { API_URL } from '../config/api';
 
-// Define our user types
-export type UserRole = "USER" | "ADMIN";  // Updated to match backend enum
-
-export interface User {
+interface User {
   id: string;
-  email: string;
   name: string;
-  role: UserRole;
+  email: string;
+  role: string;
   phone?: string;
   address?: string;
 }
 
-// API URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-
 interface AuthContextType {
   user: User | null;
-  loading: boolean;
+  isAdmin: boolean;
+  isLoading: boolean;
+  error: string | null;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
-  logout: () => void;
-  isAdmin: boolean;
-  checkAuthStatus: () => Promise<boolean>;
+  logout: () => Promise<void>;
+  updateUser: (userData: Partial<User>) => void;
+  checkAuthStatus: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | null>(null);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Check authentication status with backend
-  const checkAuthStatus = async (): Promise<boolean> => {
-    try {
-      console.log('Checking auth status with backend');
-      const response = await fetch(`${API_URL}/auth/status`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Important for cookies
-      });
-      
-      const data = await response.json();
-      console.log('Auth status response:', data);
-      
-      if (data.isLoggedIn && data.user) {
-        setUser(data.user);
-        return true;
-      } else {
-        setUser(null);
-        return false;
-      }
-    } catch (error) {
-      console.error('Error checking auth status:', error);
-      setUser(null);
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Check for existing session on mount
   useEffect(() => {
     checkAuthStatus();
   }, []);
 
-  // Login function
+  const checkAuthStatus = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`${API_URL}/auth/status`, {
+        credentials: 'include', // Include cookies in the request
+      });
+
+      const data = await response.json();
+      
+      if (data.isLoggedIn && data.user) {
+        setUser(data.user);
+        // Also store token in localStorage for API calls
+        const token = document.cookie
+          .split('; ')
+          .find(row => row.startsWith('token='))
+          ?.split('=')[1];
+          
+        if (token) {
+          localStorage.setItem('token', token);
+        }
+      } else {
+        setUser(null);
+        localStorage.removeItem('token');
+      }
+    } catch (err) {
+      console.error("Auth status check error:", err);
+      setUser(null);
+      localStorage.removeItem('token');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const login = async (email: string, password: string) => {
-    setLoading(true);
+    setIsLoading(true);
+    setError(null);
+
     try {
       const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
@@ -78,30 +89,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
-        credentials: 'include', // Important for cookies
+        credentials: 'include', // Include cookies in the request
       });
-      
+
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(errorData.message || "Login failed");
-        throw new Error(errorData.message || "Login failed");
+        throw new Error(data.message || 'Login failed');
+      }
+
+      setUser(data.user);
+      
+      // Also store token in localStorage for API calls that need Authorization header
+      const token = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('token='))
+        ?.split('=')[1];
+        
+      if (token) {
+        localStorage.setItem('token', token);
       }
       
-      const data = await response.json();
-      setUser(data.user);
-      toast.success(`Welcome back, ${data.user.name}!`);
-      return data;
-    } catch (error) {
-      console.error("Login error:", error);
-      throw error;
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred');
+      }
+      throw err;
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  // Register function
   const register = async (email: string, password: string, name: string) => {
-    setLoading(true);
+    setIsLoading(true);
+    setError(null);
+
     try {
       const response = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
@@ -109,63 +133,76 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password, name }),
-        credentials: 'include', // Important for cookies
+        credentials: 'include',
       });
-      
+
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(errorData.message || "Registration failed");
-        throw new Error(errorData.message || "Registration failed");
+        throw new Error(data.message || 'Registration failed');
+      }
+
+      setUser(data.user);
+      
+      // Also store token in localStorage
+      const token = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('token='))
+        ?.split('=')[1];
+        
+      if (token) {
+        localStorage.setItem('token', token);
       }
       
-      const data = await response.json();
-      setUser(data.user);
-      toast.success("Registration successful! Welcome aboard.");
-      return data;
-    } catch (error) {
-      console.error("Registration error:", error);
-      throw error;
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred');
+      }
+      throw err;
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  // Logout function
   const logout = async () => {
     try {
       await fetch(`${API_URL}/auth/logout`, {
         method: 'POST',
-        credentials: 'include', // Important for cookies
+        credentials: 'include',
       });
       
       setUser(null);
-      toast.success("Logged out successfully.");
-    } catch (error) {
-      console.error("Logout error:", error);
-      // Still clear the user even if the API call fails
-      setUser(null);
+      localStorage.removeItem('token');
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
+  };
+  
+  const isAdmin = user?.role === "ADMIN";
+
+  const updateUser = (userData: Partial<User>) => {
+    if (user) {
+      setUser({ ...user, ...userData });
     }
   };
 
-  const isAdmin = user?.role === "ADMIN";
-
-  const value = {
-    user,
-    loading,
-    login,
-    register,
-    logout,
-    isAdmin,
-    checkAuthStatus,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        isAdmin,
+        isLoading,
+        error,
+        login,
+        register,
+        logout,
+        updateUser,
+        checkAuthStatus
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };

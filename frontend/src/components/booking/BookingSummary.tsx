@@ -4,7 +4,7 @@ import { format, differenceInDays } from "date-fns";
 import { CalendarClock, CalendarDays, Users } from "lucide-react";
 import { Card, CardContent } from "../ui/card";
 import { Separator } from "../ui/separator";
-import { EXTRA_BED_CHARGE } from "apps/frontend/src/data/roomData";
+import { EXTRA_BED_CHARGE } from "../../data/roomData";
 
 interface BookingSummaryProps {
   selectedRoom: any;

@@ -1,6 +1,6 @@
 
 import { differenceInDays } from "date-fns";
-import { EXTRA_BED_CHARGE } from "apps/frontend/src/data/roomData";
+import { EXTRA_BED_CHARGE } from "../data/roomData";
 
 interface UseBookingCalculationsProps {
   selectedRoom: any;

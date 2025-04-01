@@ -5,7 +5,6 @@ import {
   Tv, 
   Coffee, 
   Utensils, 
-  Bed, 
   Bath, 
   Sofa, 
   RefrigeratorIcon, 

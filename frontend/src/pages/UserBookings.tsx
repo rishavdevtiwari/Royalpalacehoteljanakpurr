@@ -1,7 +1,6 @@
-
-import React, { useState } from "react";
-import { useGetUserBookings, useUpdateBookingStatus } from "@/api/useBookings";
-import { useAuth } from "@/context/AuthContext";
+import { useState } from "react";
+import { useGetUserBookings, useUpdateBookingStatus } from "../api/useBookings";
+import { useAuth } from "../context/AuthContext";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { 
@@ -11,20 +10,35 @@ import {
   CardFooter, 
   CardHeader, 
   CardTitle 
-} from "@/components/ui/card";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+} from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Badge } from "../components/ui/badge";
+import { Tabs, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { CalendarIcon, Users, Hotel, CreditCard, XCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+
+// Define types for the booking data
+interface BookingRoom {
+  roomNumber: string;
+  roomType: {
+    name: string;
+  };
+}
+
+interface Booking {
+  id: string;
+  bookingReference: string;
+  checkInDate: string;
+  checkOutDate: string;
+  adults: number;
+  children: number;
+  occupancyType: string;
+  extraBed: boolean;
+  totalAmount: number;
+  status: string;
+  createdAt: string;
+  room: BookingRoom;
+}
 
 const UserBookings = () => {
   const { user } = useAuth();
@@ -86,7 +100,7 @@ const UserBookings = () => {
   // Filter bookings based on active tab
   const filteredBookings = activeTab === "all" 
     ? bookings 
-    : bookings?.filter(booking => booking.status === activeTab.toUpperCase());
+    : bookings?.filter((booking: Booking) => booking.status === activeTab.toUpperCase());
 
   return (
     <main className="min-h-screen bg-gray-50 pt-20 pb-20">
@@ -115,7 +129,7 @@ const UserBookings = () => {
           </Card>
         ) : (
           <div className="space-y-6">
-            {filteredBookings?.map((booking) => (
+            {filteredBookings?.map((booking: Booking) => (
               <Card key={booking.id} className="overflow-hidden">
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start">

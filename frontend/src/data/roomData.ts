@@ -1,4 +1,3 @@
-
 export interface RoomRate {
   single: number;
   double?: number;
@@ -17,8 +16,7 @@ export interface RoomType {
   };
 }
 
-// Room data based on the tariff image
-export const ROOM_TYPES: RoomType[] = [
+export const ROOM_TYPES = [
   {
     id: "deluxe",
     name: "Deluxe Room",
