@@ -12,11 +12,15 @@ interface RoomCardProps {
 }
 
 const RoomCard: React.FC<RoomCardProps> = ({ room, className = "" }) => {
+  // Add safety checks to prevent errors when data is incomplete
+  const singleRate = room.rates.ep.single;
+  const doubleRate = room.rates.ep.double;
+  
   return (
     <Card className={`hotel-card group animate-fade-in ${className}`}>
       <div className="img-hover-zoom h-56 md:h-72">
         <img
-          src={room.image}
+          src={room.image || "/placeholder-room.jpg"}
           alt={room.name}
           className="w-full h-full object-cover"
         />
@@ -27,18 +31,24 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, className = "" }) => {
         <div className="flex flex-col space-y-2 mb-4">
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-600">Single Occupancy:</span>
-            <span className="font-medium">NPR {room.rates.single.toLocaleString()}</span>
+            <span className="font-medium">
+              NPR {typeof singleRate === 'number' ? singleRate.toLocaleString() : 'Contact for price'}
+            </span>
           </div>
-          {room.rates.double && (
+          {doubleRate && (
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Double Occupancy:</span>
-              <span className="font-medium">NPR {room.rates.double.toLocaleString()}</span>
+              <span className="font-medium">
+                NPR {typeof doubleRate === 'number' ? doubleRate.toLocaleString() : 'Contact for price'}
+              </span>
             </div>
           )}
         </div>
         <div className="flex items-center justify-between mt-4">
           <div className="text-hotel-primary">
-            <span className="text-2xl font-semibold">NPR {room.rates.single.toLocaleString()}</span>
+            <span className="text-2xl font-semibold">
+              NPR {typeof singleRate === 'number' ? singleRate.toLocaleString() : 'Contact for price'}
+            </span>
             <span className="text-sm text-gray-500"> / night</span>
           </div>
           <Link to={`/booking?room=${room.id}`}>

@@ -1,7 +1,8 @@
-import React from "react"
-import { useEffect, ReactNode } from "react";
+
+import { useEffect, ReactNode, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { toast } from "sonner";
 
 // Define routes that are accessible without authentication
 const publicRoutes = ["/", "/login", "/register", "/rooms", "/amenities", "/gallery", "/contact", "/about"];
@@ -14,12 +15,30 @@ interface AuthMiddlewareProps {
 }
 
 const AuthMiddleware = ({ children }: AuthMiddlewareProps) => {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, checkAuthStatus } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
-    if (!isLoading) {
+    // Attempt to verify auth status when component mounts
+    const verifyAuth = async () => {
+      try {
+        await checkAuthStatus();
+      } catch (error) {
+        console.error("Auth verification error:", error);
+        // Don't show error toast on initial load as it can be annoying
+        // Only show errors for actual auth failures after logging in
+      } finally {
+        setAuthChecked(true);
+      }
+    };
+    
+    verifyAuth();
+  }, [checkAuthStatus]);
+
+  useEffect(() => {
+    if (!isLoading && authChecked) {
       const currentPath = location.pathname;
       
       // Check if the current route requires admin privileges
@@ -34,6 +53,7 @@ const AuthMiddleware = ({ children }: AuthMiddlewareProps) => {
       
       if (requiresAdmin && (!user || user.role !== "ADMIN")) {
         // Redirect non-admin users away from admin routes
+        toast.error("You do not have permission to access that page.");
         navigate("/", { 
           state: { 
             from: location,
@@ -42,6 +62,7 @@ const AuthMiddleware = ({ children }: AuthMiddlewareProps) => {
         });
       } else if (!isPublicRoute && !user) {
         // Redirect unauthenticated users away from protected routes
+        toast.info("Please log in to access this page.");
         navigate("/login", { 
           state: { 
             from: location,
@@ -50,13 +71,13 @@ const AuthMiddleware = ({ children }: AuthMiddlewareProps) => {
         });
       }
     }
-  }, [user, isLoading, location, navigate]);
+  }, [user, isLoading, location, navigate, authChecked]);
 
   // Show a loading state if authentication is still being checked
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p>Loading...</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-hotel-primary"></div>
       </div>
     );
   }

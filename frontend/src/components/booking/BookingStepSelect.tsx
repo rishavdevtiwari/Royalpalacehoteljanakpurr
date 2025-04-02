@@ -1,4 +1,3 @@
-
 import React from "react";
 import { format, addDays, differenceInDays } from "date-fns";
 import { 
@@ -11,14 +10,12 @@ import {
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
-import { Input } from "../ui/input";
-import { Separator } from "../ui/separator";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Calendar } from "../ui/calendar";
 import { Checkbox } from "../ui/checkbox";
 import { cn } from "../../lib/utils";
 import { ROOM_TYPES, EXTRA_BED_CHARGE } from "../../data/roomData";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 
 interface DateRange {
   checkIn: Date | undefined;
@@ -69,10 +66,15 @@ const BookingStepSelect: React.FC<BookingStepSelectProps> = ({
     if (!selectedRoom) return 0;
 
     const nights = calculateNights();
-    const baseRate =
-      occupancyType === "single"
-        ? selectedRoom.rates.single
-        : selectedRoom.rates.double || selectedRoom.rates.single;
+    
+    // Fix the type error by safely accessing the rate properties
+    let baseRate = 0;
+    if (selectedRoom.rates.ep) {
+      baseRate = occupancyType === "single" 
+        ? selectedRoom.rates.ep.single 
+        : (selectedRoom.rates.ep.double || selectedRoom.rates.ep.single);
+    }
+    
     let total = baseRate * nights;
 
     // Add extra bed charge if needed
@@ -115,7 +117,7 @@ const BookingStepSelect: React.FC<BookingStepSelectProps> = ({
                         </h3>
                         <div className="text-right">
                           <p className="text-lg font-semibold text-hotel-primary">
-                            NPR {room.rates.single.toLocaleString()}
+                            NPR {room.rates.ep.single.toLocaleString()}
                           </p>
                           <p className="text-sm text-gray-500">
                             per night
@@ -313,7 +315,7 @@ const BookingStepSelect: React.FC<BookingStepSelectProps> = ({
             </div>
 
             {/* Occupancy Type (only show for rooms with double option) */}
-            {selectedRoom && selectedRoom.rates.double && (
+            {selectedRoom && selectedRoom.rates.ep && selectedRoom.rates.ep.double && (
               <div className="mb-6">
                 <Label className="mb-2 block">Occupancy Type</Label>
                 <RadioGroup
@@ -329,7 +331,7 @@ const BookingStepSelect: React.FC<BookingStepSelectProps> = ({
                       id="occupancy-single"
                     />
                     <Label htmlFor="occupancy-single">
-                      Single (NPR {selectedRoom.rates.single.toLocaleString()})
+                      Single (NPR {selectedRoom.rates.ep.single.toLocaleString()})
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -338,7 +340,7 @@ const BookingStepSelect: React.FC<BookingStepSelectProps> = ({
                       id="occupancy-double"
                     />
                     <Label htmlFor="occupancy-double">
-                      Double (NPR {selectedRoom.rates.double.toLocaleString()})
+                      Double (NPR {selectedRoom.rates.ep.double.toLocaleString()})
                     </Label>
                   </div>
                 </RadioGroup>
@@ -366,7 +368,7 @@ const BookingStepSelect: React.FC<BookingStepSelectProps> = ({
 
             {selectedRoom && dates.checkIn && dates.checkOut && (
               <>
-                <Separator className="my-6" />
+                <hr className="my-6" />
 
                 {/* Price Summary */}
                 <div className="space-y-2 mb-6">
@@ -375,10 +377,11 @@ const BookingStepSelect: React.FC<BookingStepSelectProps> = ({
                     <span>
                       NPR{" "}
                       {(
-                        (occupancyType === "single"
-                          ? selectedRoom.rates.single
-                          : selectedRoom.rates.double ||
-                            selectedRoom.rates.single) *
+                        (selectedRoom.rates.ep && (
+                          occupancyType === "single"
+                            ? selectedRoom.rates.ep.single
+                            : (selectedRoom.rates.ep.double || selectedRoom.rates.ep.single))
+                        ) *
                         calculateNights()
                       ).toLocaleString()}
                     </span>

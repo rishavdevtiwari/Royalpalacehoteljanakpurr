@@ -1,8 +1,9 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const dotenv = require('dotenv');
-const { Room, RoomType } = require('./models/Room');
-const User = require('./models/User');
+
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+import dotenv from 'dotenv';
+import { Room, RoomType } from './models/Room.js';
+import User from './models/User.js';
 
 // Load environment variables
 dotenv.config();
@@ -21,70 +22,64 @@ const roomTypes = [
   {
     name: "Deluxe Room",
     description: "Spacious room with premium amenities and comfortable furnishings.",
-    image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=800&auto=format&fit=crop",
-    rates: {
-      single: 4000,
-      double: 6000
-    },
+    rateSingle: 4000,
+    rateDouble: 5000,
+    mapRateSingle: 5500,
+    mapRateDouble: 8000,
+    apRateSingle: 6500,
+    apRateDouble: 10000,
+    maxAdults: 2,
+    maxChildren: 1,
     amenities: ["Free Wi-Fi", "Air Conditioning", "Flat-screen TV", "Mini Fridge", "Tea/Coffee Maker"],
-    maxOccupancy: {
-      adults: 2,
-      children: 1
-    }
+    imageUrl: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=800&auto=format&fit=crop"
   },
   {
     name: "Super Deluxe Room",
     description: "Luxury accommodation with enhanced amenities and extra space.",
-    image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=800&auto=format&fit=crop",
-    rates: {
-      single: 5000,
-      double: 6000
-    },
+    rateSingle: 5000,
+    rateDouble: 6000,
+    mapRateSingle: 6500,
+    mapRateDouble: 9000,
+    apRateSingle: 7500,
+    apRateDouble: 11000,
+    maxAdults: 2,
+    maxChildren: 2,
     amenities: ["Free Wi-Fi", "Air Conditioning", "Flat-screen TV", "Mini Bar", "Tea/Coffee Maker", "Seating Area"],
-    maxOccupancy: {
-      adults: 2,
-      children: 2
-    }
+    imageUrl: "https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=800&auto=format&fit=crop"
   },
   {
     name: "B&B (Bed & Breakfast)",
     description: "Comfortable room with complimentary breakfast included.",
-    image: "https://images.unsplash.com/photo-1566195992011-5f6b21e539aa?q=80&w=800&auto=format&fit=crop",
-    rates: {
-      single: 5000,
-      double: 6000
-    },
+    rateSingle: 5000,
+    rateDouble: 6000,
+    mapRateSingle: 6500,
+    mapRateDouble: 9000,
+    apRateSingle: 7500,
+    apRateDouble: 11000,
+    maxAdults: 2,
+    maxChildren: 1,
     amenities: ["Free Wi-Fi", "Air Conditioning", "Flat-screen TV", "Breakfast Included", "Tea/Coffee Maker"],
-    maxOccupancy: {
-      adults: 2,
-      children: 1
-    }
+    imageUrl: "https://images.unsplash.com/photo-1566195992011-5f6b21e539aa?q=80&w=800&auto=format&fit=crop"
   },
   {
     name: "Junior Suite",
     description: "Spacious suite with separate living area and premium amenities.",
-    image: "https://images.unsplash.com/photo-1591088398332-8a7791972843?q=80&w=800&auto=format&fit=crop",
-    rates: {
-      single: 8000
-    },
+    rateSingle: 10000,
+    rateDouble: 11000,
+    maxAdults: 2,
+    maxChildren: 2,
     amenities: ["Free Wi-Fi", "Air Conditioning", "Flat-screen TV", "Mini Bar", "Living Area", "Premium Toiletries"],
-    maxOccupancy: {
-      adults: 2,
-      children: 2
-    }
+    imageUrl: "https://images.unsplash.com/photo-1591088398332-8a7791972843?q=80&w=800&auto=format&fit=crop"
   },
   {
     name: "Executive Suite",
     description: "Luxurious suite with separate bedroom, living room, and premium amenities.",
-    image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=800&auto=format&fit=crop",
-    rates: {
-      single: 10000
-    },
+    rateSingle: 15000,
+    rateDouble: 16000,
+    maxAdults: 2,
+    maxChildren: 2,
     amenities: ["Free Wi-Fi", "Air Conditioning", "Flat-screen TV", "Mini Bar", "Living Room", "Dining Area", "Premium Toiletries", "Bathrobe & Slippers"],
-    maxOccupancy: {
-      adults: 2,
-      children: 2
-    }
+    imageUrl: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=800&auto=format&fit=crop"
   }
 ];
 
@@ -100,7 +95,7 @@ const users = [
   },
   {
     name: 'Admin User',
-    email: 'admin@royalhotelpalace',
+    email: 'admin@royalpalacehotel',
     password: 'qwerty@123456',
     role: 'ADMIN',
     phone: '9876543210',
@@ -122,18 +117,21 @@ const seedDatabase = async () => {
     const createdRoomTypes = await RoomType.create(roomTypes);
     console.log(`${createdRoomTypes.length} room types created`);
     
-    // Create rooms for each room type
+    // Create 60 rooms: 12 of each type
     const rooms = [];
     
     createdRoomTypes.forEach((roomType, typeIndex) => {
-      const floorNumber = typeIndex + 1;
-      for (let i = 1; i <= 6; i++) {
-        rooms.push({
-          roomNumber: `${floorNumber}0${i}`,
-          floor: floorNumber,
-          status: 'AVAILABLE',
-          roomTypeId: roomType._id
-        });
+      const floorStart = typeIndex * 2 + 1; // Starting floor for each room type (1, 3, 5, 7, 9)
+      
+      for (let floor = floorStart; floor <= floorStart + 1; floor++) {
+        for (let roomNum = 1; roomNum <= 6; roomNum++) {
+          rooms.push({
+            roomNumber: `${floor}${roomNum < 10 ? '0' : ''}${roomNum}`,
+            floor: floor,
+            status: 'AVAILABLE',
+            roomTypeId: roomType._id
+          });
+        }
       }
     });
     
@@ -142,7 +140,11 @@ const seedDatabase = async () => {
     
     // Create users
     for (const user of users) {
-      await User.create(user);
+      const hashedPassword = await bcrypt.hash(user.password, 10);
+      await User.create({
+        ...user,
+        password: hashedPassword
+      });
     }
     console.log(`${users.length} users created`);
 

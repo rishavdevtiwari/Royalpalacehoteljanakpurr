@@ -1,3 +1,4 @@
+
 import mongoose from 'mongoose';
 
 const roomSchema = new mongoose.Schema({
@@ -28,11 +29,28 @@ const roomTypeSchema = new mongoose.Schema({
     required: true
   },
   description: String,
+  // EP Rate (European Plan - Room only)
   rateSingle: {
     type: Number,
     required: true
   },
-  rateDouble: Number,
+  rateDouble: {
+    type: Number
+  },
+  // MAP Rate (Modified American Plan - Half Board)
+  mapRateSingle: {
+    type: Number
+  },
+  mapRateDouble: {
+    type: Number
+  },
+  // AP Rate (American Plan - Full Board)
+  apRateSingle: {
+    type: Number
+  },
+  apRateDouble: {
+    type: Number
+  },
   maxAdults: {
     type: Number,
     required: true
